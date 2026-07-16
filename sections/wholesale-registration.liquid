@@ -1,0 +1,504 @@
+
+<style>
+  .wsf-wrap{max-width:720px;margin:40px auto;padding:0 20px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1a}
+  .wsf-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:40px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .wsf-logo{text-align:center;margin-bottom:24px}
+  .wsf-logo img{max-width:200px;height:auto}
+  .wsf-title{font-size:28px;font-weight:600;margin:0 0 8px;text-align:center;letter-spacing:-.02em}
+  .wsf-intro{font-size:15px;line-height:1.6;color:#4b5563;text-align:center;margin:0 0 32px;max-width:520px;margin-left:auto;margin-right:auto}
+  .wsf-section{margin-top:32px;padding-top:24px;border-top:1px solid #f3f4f6}
+  .wsf-section:first-of-type{border-top:0;padding-top:0;margin-top:0}
+  .wsf-section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 16px}
+  .wsf-section-hint{font-size:13px;color:#6b7280;margin:-8px 0 16px}
+  .wsf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
+  .wsf-row-3{display:grid;grid-template-columns:120px 1fr;gap:12px;margin-bottom:14px}
+  .wsf-field{margin-bottom:14px}
+  .wsf-label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:#374151}
+  .wsf-label .req{color:#dc2626;margin-left:2px}
+  .wsf-input,.wsf-select,.wsf-textarea{width:100%;padding:10px 12px;font-size:14px;border:1px solid #d1d5db;border-radius:6px;background:#fff;transition:border-color .15s,box-shadow .15s;font-family:inherit;box-sizing:border-box}
+  .wsf-input:focus,.wsf-select:focus,.wsf-textarea:focus{outline:0;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+  .wsf-textarea{resize:vertical;min-height:90px}
+  .wsf-checkbox-row{display:flex;align-items:center;gap:8px;margin-top:20px}
+  .wsf-checkbox-row input{width:16px;height:16px;cursor:pointer}
+  .wsf-checkbox-row label{font-size:14px;color:#4b5563;cursor:pointer;margin:0}
+  .wsf-billing-toggle{display:flex;align-items:center;gap:8px;margin:-8px 0 16px;padding:10px 12px;background:#f9fafb;border-radius:6px}
+  .wsf-billing-toggle input{cursor:pointer}
+  .wsf-billing-toggle label{font-size:14px;color:#374151;cursor:pointer;margin:0}
+  .wsf-billing-fields{display:none}
+  .wsf-billing-fields.show{display:block}
+  .wsf-submit{width:100%;background:#111827;color:#fff;padding:14px 20px;font-size:15px;font-weight:600;border:0;border-radius:6px;cursor:pointer;margin-top:24px;transition:background .15s}
+  .wsf-submit:hover{background:#000}
+  .wsf-submit:disabled{background:#9ca3af;cursor:not-allowed}
+  .wsf-msg{padding:12px 16px;border-radius:6px;margin-bottom:20px;font-size:14px}
+  .wsf-msg.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+  .wsf-msg.success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+  .wsf-hint{font-size:12px;color:#6b7280;margin-top:4px}
+  @media(max-width:640px){
+    .wsf-card{padding:24px 20px}
+    .wsf-row,.wsf-row-3{grid-template-columns:1fr}
+    .wsf-title{font-size:24px}
+  }
+</style>
+
+<div class="wsf-wrap">
+  <div class="wsf-card">
+
+    <div class="wsf-logo">
+      {%- if section.settings.logo != blank -%}
+        <img src="{{ section.settings.logo | img_url: '400x' }}" alt="{{ shop.name }}">
+      {%- else -%}
+        <h1 style="font-size:22px;font-weight:600;margin:0;color:#1a1a1a">{{ shop.name }} Wholesale</h1>
+      {%- endif -%}
+    </div>
+
+    <h2 class="wsf-title">Register Your Account</h2>
+    <p class="wsf-intro">
+      Welcome to RainCaper — we're so happy you're here. To activate your wholesale account, please complete this short form. Our team will review and follow up promptly so you can begin browsing and stocking your favorite styles.
+    </p>
+
+    {%- form 'create_customer', id: 'wsf-form', novalidate: 'novalidate' -%}
+
+      {%- if form.posted_successfully? -%}
+        <div class="wsf-msg success">
+          Thank you — your application has been received. Our team will review it and follow up within 1–2 business days. You'll receive an email with next steps once approved.
+        </div>
+      {%- endif -%}
+
+      {%- if form.errors -%}
+        <div class="wsf-msg error">
+          {% for field in form.errors %}
+            <p style="margin:4px 0">
+              {%- if field == 'email' -%}
+                There was a problem with the email address: {{ form.errors.messages[field] }}. If you've applied before, please contact us at wholesale@raincaper.com.
+              {%- else -%}
+                {{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}.
+              {%- endif -%}
+            </p>
+          {% endfor %}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} === Hidden fields submitted to /account === {%- endcomment -%}
+      <input type="hidden" name="customer[tags]" value="wholesale-pending, wholesale">
+      <input type="hidden" name="customer[password]" id="wsf-password">
+      <input type="hidden" name="customer[password_confirmation]" id="wsf-password-confirm">
+      <input type="hidden" name="customer[note]" id="wsf-note">
+      <input type="hidden" name="customer[accepts_marketing]" id="wsf-accepts-marketing" value="false">
+
+      <!-- ============ COMPANY DETAILS ============ -->
+      <div class="wsf-section">
+        <h3 class="wsf-section-title">Company Details</h3>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-company">Company Name<span class="req">*</span></label>
+          <input class="wsf-input" type="text" id="wsf-company" required>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-website">Website / Storefront URL<span class="req">*</span></label>
+          <input class="wsf-input" type="url" id="wsf-website" placeholder="https://" required>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-phone-number">Phone<span class="req">*</span></label>
+          <div class="wsf-row-3">
+            <select class="wsf-select" id="wsf-phone-cc" required>
+              <option value="+1">US/CA +1</option>
+              <option value="+44">UK +44</option>
+              <option value="+61">AU +61</option>
+              <option value="+64">NZ +64</option>
+              <option value="+33">FR +33</option>
+              <option value="+49">DE +49</option>
+              <option value="+other">Other</option>
+            </select>
+            <input class="wsf-input" type="tel" id="wsf-phone-number" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SHIPPING ADDRESS ============ -->
+      <div class="wsf-section">
+        <h3 class="wsf-section-title">Shipping Address<span class="req" style="color:#dc2626">*</span></h3>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-ship-1">Address Line 1<span class="req">*</span></label>
+          <input class="wsf-input" type="text" id="wsf-ship-1" required>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-ship-2">Address Line 2</label>
+          <input class="wsf-input" type="text" id="wsf-ship-2">
+        </div>
+
+        <div class="wsf-row">
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-ship-city">City<span class="req">*</span></label>
+            <input class="wsf-input" type="text" id="wsf-ship-city" required>
+          </div>
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-ship-province">State / Province<span class="req">*</span></label>
+            <input class="wsf-input" type="text" id="wsf-ship-province" required>
+          </div>
+        </div>
+
+        <div class="wsf-row">
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-ship-zip">Zip / Postal Code<span class="req">*</span></label>
+            <input class="wsf-input" type="text" id="wsf-ship-zip" required>
+          </div>
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-ship-country">Country<span class="req">*</span></label>
+            <select class="wsf-select" id="wsf-ship-country" required>
+              <option value="">— Select —</option>
+              <option value="United States" selected>United States</option>
+              <option value="Canada">Canada</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Australia">Australia</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="Ireland">Ireland</option>
+              <option value="France">France</option>
+              <option value="Germany">Germany</option>
+              <option value="Japan">Japan</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ BILLING ADDRESS (toggle) ============ -->
+      <div class="wsf-section">
+        <h3 class="wsf-section-title">Billing Address</h3>
+        <div class="wsf-billing-toggle">
+          <input type="checkbox" id="wsf-billing-different">
+          <label for="wsf-billing-different">Billing address is different from shipping</label>
+        </div>
+
+        <div id="wsf-billing-fields" class="wsf-billing-fields">
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-bill-1">Address Line 1</label>
+            <input class="wsf-input" type="text" id="wsf-bill-1">
+          </div>
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-bill-2">Address Line 2</label>
+            <input class="wsf-input" type="text" id="wsf-bill-2">
+          </div>
+          <div class="wsf-row">
+            <div class="wsf-field">
+              <label class="wsf-label" for="wsf-bill-city">City</label>
+              <input class="wsf-input" type="text" id="wsf-bill-city">
+            </div>
+            <div class="wsf-field">
+              <label class="wsf-label" for="wsf-bill-province">State / Province</label>
+              <input class="wsf-input" type="text" id="wsf-bill-province">
+            </div>
+          </div>
+          <div class="wsf-row">
+            <div class="wsf-field">
+              <label class="wsf-label" for="wsf-bill-zip">Zip / Postal Code</label>
+              <input class="wsf-input" type="text" id="wsf-bill-zip">
+            </div>
+            <div class="wsf-field">
+              <label class="wsf-label" for="wsf-bill-country">Country</label>
+              <select class="wsf-select" id="wsf-bill-country">
+                <option value="">— Select —</option>
+                <option value="United States">United States</option>
+                <option value="Canada">Canada</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Australia">Australia</option>
+                <option value="New Zealand">New Zealand</option>
+                <option value="Ireland">Ireland</option>
+                <option value="France">France</option>
+                <option value="Germany">Germany</option>
+                <option value="Japan">Japan</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PRIMARY CONTACT ============ -->
+      <div class="wsf-section">
+        <h3 class="wsf-section-title">Primary Contact</h3>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-business-type">Business Type<span class="req">*</span></label>
+          <select class="wsf-select" id="wsf-business-type" required>
+            <option value="">— Please Select —</option>
+            <option>Brick &amp; Mortar Retail</option>
+            <option>Online Store / Ecommerce</option>
+            <option>Boutique / Specialty Shop</option>
+            <option>Gift Shop</option>
+            <option>Museum or Gallery Shop</option>
+            <option>Department Store</option>
+            <option>Distributor / Reseller</option>
+            <option>Catalog</option>
+            <option>Subscription Box</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="wsf-row">
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-first-name">First Name<span class="req">*</span></label>
+            <input class="wsf-input" type="text" id="wsf-first-name" name="customer[first_name]" required>
+          </div>
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-last-name">Last Name<span class="req">*</span></label>
+            <input class="wsf-input" type="text" id="wsf-last-name" name="customer[last_name]" required>
+          </div>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-title">Title<span class="req">*</span></label>
+          <input class="wsf-input" type="text" id="wsf-title" placeholder="e.g. Owner, Buyer, Manager" required>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-email">Email Address<span class="req">*</span></label>
+          <input class="wsf-input" type="email" id="wsf-email" name="customer[email]" required>
+        </div>
+      </div>
+
+      <!-- ============ ADDITIONAL CONTACT (optional) ============ -->
+      <div class="wsf-section">
+        <h3 class="wsf-section-title">Additional Contact</h3>
+        <p class="wsf-section-hint">Optional — add a secondary contact if applicable.</p>
+
+        <div class="wsf-row">
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-add-name">Contact Name</label>
+            <input class="wsf-input" type="text" id="wsf-add-name">
+          </div>
+          <div class="wsf-field">
+            <label class="wsf-label" for="wsf-add-title">Title</label>
+            <input class="wsf-input" type="text" id="wsf-add-title">
+          </div>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-add-email">Email Address</label>
+          <input class="wsf-input" type="email" id="wsf-add-email">
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-add-phone">Phone</label>
+          <div class="wsf-row-3">
+            <select class="wsf-select" id="wsf-add-phone-cc">
+              <option value="+1">US/CA +1</option>
+              <option value="+44">UK +44</option>
+              <option value="+61">AU +61</option>
+              <option value="+64">NZ +64</option>
+              <option value="+33">FR +33</option>
+              <option value="+49">DE +49</option>
+              <option value="+other">Other</option>
+            </select>
+            <input class="wsf-input" type="tel" id="wsf-add-phone">
+          </div>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-social">Social Media Links</label>
+          <input class="wsf-input" type="text" id="wsf-social" placeholder="Instagram, Facebook, TikTok, etc.">
+        </div>
+      </div>
+
+      <!-- ============ TAX & COMPLIANCE ============ -->
+      <div class="wsf-section">
+        <h3 class="wsf-section-title">Tax &amp; Compliance</h3>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-tax-id">Tax ID / EIN<span class="req">*</span></label>
+          <input class="wsf-input" type="text" id="wsf-tax-id" required>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-resale-cert-url">Reseller Certificate Link</label>
+          <input class="wsf-input" type="url" id="wsf-resale-cert-url" placeholder="https://drive.google.com/... or Dropbox/etc">
+          <p class="wsf-hint">Paste a link to your reseller certificate (Google Drive, Dropbox, etc.) — or email it to wholesale@raincaper.com after submitting.</p>
+        </div>
+      </div>
+
+      <!-- ============ ABOUT ============ -->
+      <div class="wsf-section">
+        <h3 class="wsf-section-title">About Your Business</h3>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-volume">Estimated Monthly Order Volume<span class="req">*</span></label>
+          <select class="wsf-select" id="wsf-volume" required>
+            <option value="">— Please Select —</option>
+            <option>Under $500</option>
+            <option>$500 – $1,000</option>
+            <option>$1,000 – $2,500</option>
+            <option>$2,500 – $5,000</option>
+            <option>$5,000+</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-source">How Did You Hear About RainCaper?</label>
+          <select class="wsf-select" id="wsf-source">
+            <option value="">— Please Select —</option>
+            <option>Google / search engine</option>
+            <option>Trade show</option>
+            <option>Referral from another retailer</option>
+            <option>Social media (Instagram, Facebook, etc.)</option>
+            <option>Magazine / publication</option>
+            <option>Existing wholesale customer</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="wsf-field">
+          <label class="wsf-label" for="wsf-about">Tell Us About Your Store</label>
+          <textarea class="wsf-textarea" id="wsf-about" placeholder="Where you sell, your customer base, what drew you to RainCaper, etc."></textarea>
+        </div>
+
+        <div class="wsf-checkbox-row">
+          <input type="checkbox" id="wsf-newsletter" checked>
+          <label for="wsf-newsletter">Subscribe to our wholesale newsletter</label>
+        </div>
+      </div>
+
+      <button type="submit" class="wsf-submit" id="wsf-submit">Submit Application</button>
+
+    {%- endform -%}
+  </div>
+</div>
+
+<script>
+(function(){
+  var form = document.getElementById('wsf-form');
+  if(!form) return;
+
+  // Toggle billing address fields
+  var billingToggle = document.getElementById('wsf-billing-different');
+  var billingFields = document.getElementById('wsf-billing-fields');
+  billingToggle.addEventListener('change', function(){
+    if(this.checked){ billingFields.classList.add('show'); }
+    else { billingFields.classList.remove('show'); }
+  });
+
+  // Generate a strong random password the customer never sees.
+  // Includes upper, lower, digits, and required symbol/digit/letter to satisfy any policy.
+  function generatePassword(){
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    var pw = '';
+    var crypto = window.crypto || window.msCrypto;
+    if(crypto && crypto.getRandomValues){
+      var arr = new Uint32Array(40);
+      crypto.getRandomValues(arr);
+      for(var i = 0; i < 40; i++){ pw += chars[arr[i] % chars.length]; }
+    } else {
+      for(var j = 0; j < 40; j++){ pw += chars[Math.floor(Math.random() * chars.length)]; }
+    }
+    // Ensure at least one of each required type
+    return pw + '!1A';
+  }
+
+  function val(id){
+    var el = document.getElementById(id);
+    if(!el) return '';
+    return (el.value || '').trim();
+  }
+
+  // Build the customer note from all visible custom fields
+  function buildNote(){
+    var lines = [];
+    lines.push('=== Wholesale Application ===');
+    lines.push('Submitted: ' + new Date().toISOString());
+    lines.push('');
+    lines.push('--- Company ---');
+    lines.push('Company Name: ' + val('wsf-company'));
+    lines.push('Website: ' + val('wsf-website'));
+    lines.push('Phone: ' + val('wsf-phone-cc') + ' ' + val('wsf-phone-number'));
+    lines.push('');
+    lines.push('--- Shipping Address ---');
+    lines.push(val('wsf-ship-1'));
+    if(val('wsf-ship-2')) lines.push(val('wsf-ship-2'));
+    lines.push(val('wsf-ship-city') + ', ' + val('wsf-ship-province') + ' ' + val('wsf-ship-zip'));
+    lines.push(val('wsf-ship-country'));
+    lines.push('');
+    lines.push('--- Billing Address ---');
+    if(billingToggle.checked){
+      lines.push(val('wsf-bill-1'));
+      if(val('wsf-bill-2')) lines.push(val('wsf-bill-2'));
+      lines.push(val('wsf-bill-city') + ', ' + val('wsf-bill-province') + ' ' + val('wsf-bill-zip'));
+      lines.push(val('wsf-bill-country'));
+    } else {
+      lines.push('[Same as shipping]');
+    }
+    lines.push('');
+    lines.push('--- Contact ---');
+    lines.push('Business Type: ' + val('wsf-business-type'));
+    lines.push('Title: ' + val('wsf-title'));
+    lines.push('');
+    lines.push('--- Additional Contact ---');
+    if(val('wsf-add-name') || val('wsf-add-email') || val('wsf-add-phone')){
+      lines.push('Name: ' + val('wsf-add-name'));
+      lines.push('Title: ' + val('wsf-add-title'));
+      lines.push('Email: ' + val('wsf-add-email'));
+      lines.push('Phone: ' + val('wsf-add-phone-cc') + ' ' + val('wsf-add-phone'));
+      lines.push('Social: ' + val('wsf-social'));
+    } else {
+      lines.push('[None provided]');
+      if(val('wsf-social')) lines.push('Social: ' + val('wsf-social'));
+    }
+    lines.push('');
+    lines.push('--- Tax & Compliance ---');
+    lines.push('Tax ID / EIN: ' + val('wsf-tax-id'));
+    lines.push('Reseller Certificate: ' + (val('wsf-resale-cert-url') || '[Not provided — request via email]'));
+    lines.push('');
+    lines.push('--- About ---');
+    lines.push('Estimated Monthly Volume: ' + val('wsf-volume'));
+    lines.push('How They Heard: ' + (val('wsf-source') || '[Not specified]'));
+    lines.push('Store Description:');
+    lines.push(val('wsf-about') || '[Not provided]');
+    lines.push('');
+    lines.push('--- Newsletter ---');
+    lines.push('Subscribed: ' + (document.getElementById('wsf-newsletter').checked ? 'Yes' : 'No'));
+    return lines.join('\n');
+  }
+
+  form.addEventListener('submit', function(e){
+    if(!form.checkValidity()){
+      // Let the browser show native validation
+      return;
+    }
+    // Generate a hidden random password
+    var pw = generatePassword();
+    document.getElementById('wsf-password').value = pw;
+    document.getElementById('wsf-password-confirm').value = pw;
+
+    // Aggregate the note
+    document.getElementById('wsf-note').value = buildNote();
+
+    // Newsletter checkbox -> customer[accepts_marketing]
+    document.getElementById('wsf-accepts-marketing').value =
+      document.getElementById('wsf-newsletter').checked ? 'true' : 'false';
+
+    // Disable button to prevent double-submit
+    var btn = document.getElementById('wsf-submit');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+    // Form submits naturally to /account
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Wholesale Registration",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo (optional — defaults to shop name)"
+    }
+  ],
+  "presets": [
+    { "name": "Wholesale Registration" }
+  ]
+}
+{% endschema %}

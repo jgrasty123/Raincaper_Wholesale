@@ -1,0 +1,19 @@
+{% comment %}
+snippets/close-icon-template.liquid
+
+Contains a template with the close icon. Used in WAU.Modals script.
+
+Usage:
+  {% render 'close-icon-template' %}
+
+{% endcomment %}
+<template id="close-icon">
+  {% render 'snip-icons',
+   wrapper: '.icn-close',
+   type: 'apollo',
+   icon: 'close',
+   classes: '',
+   size: '14px',
+   fill: 'var(--text-color)',
+   hover: 'var(--text-color)' %}
+</template>

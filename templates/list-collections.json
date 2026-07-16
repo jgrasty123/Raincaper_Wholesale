@@ -1,0 +1,1 @@
+{"sections":{"banner":{"type":"banner-image","settings":{"banner_height":400}},"main":{"type":"main-list-collections","settings":{"text":"","center_align":true}},"grid":{"type":"main-list-collections-all","disabled":true,"settings":{"grid":3,"mobile_1pr":false}}},"order":["banner","main","grid"]}
