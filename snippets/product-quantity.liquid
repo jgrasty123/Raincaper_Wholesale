@@ -1,7 +1,27 @@
 {% comment %}
-snippets/product-quantity.liqudi
+snippets/product-quantity.liquid
+Quantity selector — respects B2B catalog quantity rules (min / increment).
+For buyers outside a B2B catalog, quantity_rule defaults to min 1 / increment 1,
+so retail behavior is unchanged.
 {% endcomment %}
+{%- liquid
+  assign qty_rule = product.selected_or_first_available_variant.quantity_rule
+  assign qty_min = 1
+  assign qty_step = 1
+  if qty_rule.min > 1
+    assign qty_min = qty_rule.min
+  endif
+  if qty_rule.increment > 1
+    assign qty_step = qty_rule.increment
+  endif
+-%}
 <label for="{% if product == blank %}qty-onboard__product{% else %}qty-{{ product.id }}{% endif %}" class="h5">{{ 'products.product.quantity' | t }}</label>
 <button class="down quantity-control-down" type="button">-</button>
-  <input id="{% if product == blank %}qty-onboard__product{% else %}qty-{{ product.id }}{% endif %}" min="1" type="text" name="quantity" class="js-qty-input quantity" value="1" />
+  <input id="{% if product == blank %}qty-onboard__product{% else %}qty-{{ product.id }}{% endif %}" min="{{ qty_min }}" step="{{ qty_step }}" data-qty-min="{{ qty_min }}" data-qty-step="{{ qty_step }}" type="text" name="quantity" class="js-qty-input quantity" value="{{ qty_min }}" />
 <button class="up quantity-control-up" type="button">+</button>
+{%- if qty_min > 1 or qty_step > 1 -%}
+  <p class="quantity-rule-note" style="font-size: 0.85em; margin: 4px 0 0; opacity: 0.75;">
+    {%- if qty_min > 1 -%}Minimum {{ qty_min }}{%- endif -%}
+    {%- if qty_step > 1 %} &middot; sold in units of {{ qty_step }}{%- endif -%}
+  </p>
+{%- endif -%}

@@ -3305,8 +3305,28 @@ Shopify.theme.ajaxCart = {
     }).catch(error => {
       if (error.status == 422) {
 
-        // Show error msg
-        theme.Helpers.fadeIn(context.querySelector('.js-error-msg'));
+        var errorMsgEl = context.querySelector('.js-error-msg');
+
+        // Show Shopify's specific error (e.g. quantity-rule minimums) instead of
+        // the generic fallback whenever the response provides one.
+        var showError = function() {
+          theme.Helpers.fadeIn(errorMsgEl);
+          setTimeout(function(){
+            theme.Helpers.fadeOut(errorMsgEl);
+          }, 5000);
+        };
+
+        if (typeof error.json === 'function') {
+          error.json().then(function(data) {
+            var detail = data && (data.description || data.message);
+            if (detail && typeof detail === 'string') {
+              errorMsgEl.innerHTML = '<b>' + config.cart_error + '</b>&nbsp;&nbsp;&nbsp;' + detail;
+            }
+            showError();
+          }).catch(showError);
+        } else {
+          showError();
+        }
 
         // Re-enable add to cart button
         if (context.querySelector(selectors.addToCart).hasAttribute('data-preorder')) {
@@ -3316,10 +3336,6 @@ Shopify.theme.ajaxCart = {
         }
         context.querySelector(selectors.addToCart).classList.remove('disabled');
         context.querySelector(selectors.addToCart).removeAttribute('disabled', 'disabled');
-
-        setTimeout(function(){
-          theme.Helpers.fadeOut(context.querySelector('.js-error-msg'));
-        }, 3000);
       } else {
         console.log(error)
       }
@@ -5985,9 +6001,14 @@ theme.ProductQty = function(context, events) {
     events.on("quantitycontrol:click", change);
 
     function change(value) {
-      var quantity = parseInt(element.value) + value;
+      // Respect B2B catalog quantity rules (min / increment) when present.
+      // The visible .js-qty-input carries the attributes; hidden .formQty follows it.
+      var ruleSource = qtyInput || element;
+      var step = parseInt(ruleSource.getAttribute('step')) || 1;
+      var min = parseInt(ruleSource.getAttribute('min')) || 1;
+      var quantity = parseInt(element.value) + (value * step);
 
-      if ( quantity < 1 ) {
+      if ( quantity < min ) {
         return false;
       }
 
