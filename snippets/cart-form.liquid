@@ -174,8 +174,28 @@
                  type="button">
                 -
               </button>
+              {%- liquid
+                # Line order rule: native B2B quantity_rule wins, then per-product
+                # metafields custom.moq_min / custom.moq_increment, then theme settings.
+                assign line_min = settings.wholesale_qty_min | default: 1
+                assign line_step = settings.wholesale_qty_step | default: 1
+                if item.product.metafields.custom.moq_min.value != blank
+                  assign line_min = item.product.metafields.custom.moq_min.value
+                endif
+                if item.product.metafields.custom.moq_increment.value != blank
+                  assign line_step = item.product.metafields.custom.moq_increment.value
+                endif
+                if item.variant.quantity_rule.min > 1
+                  assign line_min = item.variant.quantity_rule.min
+                endif
+                if item.variant.quantity_rule.increment > 1
+                  assign line_step = item.variant.quantity_rule.increment
+                endif
+              -%}
               <input class="updates_{{ item.id }} ajax-cart__qty-input v-center a-center {% if no_js_cart %}ajax-cart__qty-input--no-js{% else %}ajax-cart__qty-input{% endif %}"
                 data-item-qty
+                data-qty-min="{{ line_min }}"
+                data-qty-step="{{ line_step }}"
                 data-item-id="{{ item.id }}"
                 id="{{ item.id }}"
                 data-item-key="{{ item.key }}"
@@ -193,6 +213,9 @@
               </button>
             </div>
             <input class="ajax-cart__item-update--no-js button-as-link" type="submit" name="update" style="display:none;" value="{{ 'cart.general.update' | t }}">
+            {%- if line_min > 1 or line_step > 1 -%}
+              <p class="quantity-rule-note" style="font-size: 0.8em; margin: 4px 0 0; opacity: 0.75;">Min {{ line_min }} &middot; units of {{ line_step }}</p>
+            {%- endif -%}
           </li>
           <li class="ajax-cart__item-line-price v-center">
             <dl {% unless item.original_line_price != item.final_line_price %}class="hide" {% endunless %}data-cart-item-discounted-price-group>
@@ -300,6 +323,7 @@
           <span class="cart-total"></span></p>
         </div>
       </div>
+      <div class="note note-error js-qty-adjust-note" style="display:none; margin-bottom: 10px;"></div>
       <div class="ajax-cart__buttons">
         <a class="ajax-cart__button-view_cart button secondary-button" href="{{ routes.cart_url }}">{{ 'products.product.view_cart' | t }}</a>
 

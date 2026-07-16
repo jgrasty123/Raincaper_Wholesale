@@ -8,6 +8,12 @@ so retail behavior is unchanged.
   assign qty_rule = product.selected_or_first_available_variant.quantity_rule
   assign qty_min = settings.wholesale_qty_min | default: 1
   assign qty_step = settings.wholesale_qty_step | default: 1
+  if product.metafields.custom.moq_min.value != blank
+    assign qty_min = product.metafields.custom.moq_min.value
+  endif
+  if product.metafields.custom.moq_increment.value != blank
+    assign qty_step = product.metafields.custom.moq_increment.value
+  endif
   if qty_rule.min > 1
     assign qty_min = qty_rule.min
   endif

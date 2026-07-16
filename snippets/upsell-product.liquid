@@ -59,6 +59,12 @@
                         assign fq_rule = product_upsell.selected_or_first_available_variant.quantity_rule
                         assign fq_min = settings.wholesale_qty_min | default: 1
                         assign fq_step = settings.wholesale_qty_step | default: 1
+                        if product_upsell.metafields.custom.moq_min.value != blank
+                          assign fq_min = product_upsell.metafields.custom.moq_min.value
+                        endif
+                        if product_upsell.metafields.custom.moq_increment.value != blank
+                          assign fq_step = product_upsell.metafields.custom.moq_increment.value
+                        endif
                         if fq_rule.min > 1
                           assign fq_min = fq_rule.min
                         endif

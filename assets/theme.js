@@ -2998,6 +2998,8 @@ Shopify.theme.ajaxCart = {
     });
   },
   cartEvents: function cartEvents(config) {
+    Shopify.theme.ajaxCart.guardCheckout(config);
+
     var selectors = {
       cartDrawerRemove: '.js-cart-remove',
       cartDrawerQty: '[data-item-qty]',
@@ -3019,6 +3021,11 @@ Shopify.theme.ajaxCart = {
             itemKey = this.dataset.itemKey,
             itemMax = this.dataset.limit,
             lineElement = element.closest('.ajax-cart__cart-item');
+
+        // Snap typed values to the line's order rule (min / increment)
+        if (quantity > 0) {
+          quantity = Shopify.theme.ajaxCart.snapQty(quantity, Shopify.theme.ajaxCart.lineRule(this));
+        }
 
         // Set new quantity
         element.value = quantity;
@@ -3053,7 +3060,8 @@ Shopify.theme.ajaxCart = {
       element.addEventListener('click', function (e) {
         e.preventDefault();
 
-        if (this.nextElementSibling.value === '1' ) {
+        var qtyInputEl = this.nextElementSibling;
+        if (parseInt(qtyInputEl.value) <= Shopify.theme.ajaxCart.lineRule(qtyInputEl).min ) {
           var itemKey = this.dataset.itemKey;
           Shopify.theme.ajaxCart.removeFromCart(itemKey, config);
         } else {
@@ -3142,6 +3150,70 @@ Shopify.theme.ajaxCart = {
       Shopify.theme.ajaxCart.updateView(config, state);
     });
   },
+  lineRule: function lineRule(input) {
+    var min = 1, step = 1;
+    if (input && input.dataset) {
+      min = parseInt(input.dataset.qtyMin) || 1;
+      step = parseInt(input.dataset.qtyStep) || 1;
+    }
+    return { min: min, step: step };
+  },
+  snapQty: function snapQty(quantity, rule) {
+    var snapped = Math.ceil(quantity / rule.step) * rule.step;
+    if (snapped < rule.min) snapped = rule.min;
+    return snapped;
+  },
+  guardCheckout: function guardCheckout(config) {
+    document.querySelectorAll('.js-cart-form').forEach(function(form) {
+      if (form.dataset.qtyGuard) return;
+      form.dataset.qtyGuard = 'true';
+
+      form.addEventListener('submit', function(e) {
+        var updates = {};
+        var invalid = false;
+
+        form.querySelectorAll('[data-item-qty]').forEach(function(input) {
+          var rule = Shopify.theme.ajaxCart.lineRule(input);
+          var qty = parseInt(input.value) || 0;
+          if (qty > 0) {
+            var snapped = Shopify.theme.ajaxCart.snapQty(qty, rule);
+            if (snapped !== qty) {
+              invalid = true;
+              updates[input.dataset.itemKey] = snapped;
+            }
+          }
+        });
+
+        if (!invalid) return;
+
+        // Fix the quantities instead of letting checkout hard-fail
+        e.preventDefault();
+
+        var requestConfig = Shopify.theme.cart.getDefaultRequestConfig();
+        requestConfig.method = 'POST';
+        requestConfig.body = JSON.stringify({ updates: updates });
+
+        fetch('/cart/update.js', requestConfig)
+          .then(function(res) { return res.json(); })
+          .then(function() {
+            try { sessionStorage.setItem('wsQtyAdjusted', '1'); } catch (err) {}
+            window.location.href = config.cart_url;
+          })
+          .catch(function(err) { console.error(err); });
+      });
+    });
+
+    // After an auto-adjust reload, tell the buyer what happened
+    try {
+      if (sessionStorage.getItem('wsQtyAdjusted')) {
+        sessionStorage.removeItem('wsQtyAdjusted');
+        document.querySelectorAll('.js-qty-adjust-note').forEach(function(note) {
+          note.innerHTML = '<p><b>Quantities updated.</b>&nbsp;&nbsp;Some items were adjusted to meet the order minimums and case-pack increments shown on each line. Please review and check out again.</p>';
+          note.style.display = 'block';
+        });
+      }
+    } catch (err) {}
+  },
   adjustQty: function adjustQty(value, itemId, config) {
 
     var selectors = {
@@ -3153,14 +3225,16 @@ Shopify.theme.ajaxCart = {
     document.querySelectorAll(selectors.lineItem).forEach((element, i) => {
       elementInput = element.querySelector(selectors.updatesItem),
       key = elementInput.dataset.itemKey,
-      max = elementInput.dataset.limit,
-      quantity = parseInt(elementInput.value) + parseInt(value);
+      max = elementInput.dataset.limit;
+
+      var rule = Shopify.theme.ajaxCart.lineRule(elementInput);
+      quantity = parseInt(elementInput.value) + (parseInt(value) * rule.step);
 
       // Check limit to prevent over adding
       if (Shopify.theme.ajaxCart.checkLimit(max, quantity, element, config)) return false;
 
-      // Check new qty to prevent going lower than 1
-      if (quantity === 0 ) return false;
+      // Don't step below the line minimum (the minus button removes the line at the minimum)
+      if (quantity < rule.min ) return false;
 
       // Set new quantity
       elementInput.value = quantity;

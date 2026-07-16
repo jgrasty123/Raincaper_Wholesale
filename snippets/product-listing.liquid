@@ -186,6 +186,9 @@
   {%- liquid
     assign card_rule = product.first_available_variant.quantity_rule
     assign card_min = settings.wholesale_qty_min | default: 1
+    if product.metafields.custom.moq_min.value != blank
+      assign card_min = product.metafields.custom.moq_min.value
+    endif
     if card_rule.min > 1
       assign card_min = card_rule.min
     endif
