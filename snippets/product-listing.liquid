@@ -183,6 +183,19 @@
   <!-- Hidden input for variant ID -->
   <input type="hidden" id="{{ product.first_available_variant.id }}" name="id" value="{{ product.first_available_variant.id }}" />
 
+  {%- liquid
+    assign card_rule = product.first_available_variant.quantity_rule
+    assign card_min = 1
+    if card_rule.min > 1
+      assign card_min = card_rule.min
+    endif
+  -%}
+  <!-- Quantity honors B2B catalog minimums; defaults to 1 outside a B2B catalog -->
+  <input type="hidden" name="quantity" value="{{ card_min }}" />
+  {%- if card_min > 1 -%}
+    <p class="quantity-rule-note" style="font-size: 0.85em; margin: 4px 0 0; opacity: 0.75;">Minimum {{ card_min }} per order</p>
+  {%- endif -%}
+
   <!-- Success/Error messages (already present) -->
   <div class="note note-success mt3 js-added-msg" style="display: none">
     <b>{{ 'products.product.added' | t }}</b>&nbsp;&nbsp;&nbsp;
