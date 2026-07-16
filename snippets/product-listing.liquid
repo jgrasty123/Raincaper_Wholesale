@@ -185,7 +185,7 @@
 
   {%- liquid
     assign card_rule = product.first_available_variant.quantity_rule
-    assign card_min = 1
+    assign card_min = settings.wholesale_qty_min | default: 1
     if card_rule.min > 1
       assign card_min = card_rule.min
     endif

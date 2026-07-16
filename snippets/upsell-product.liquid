@@ -57,8 +57,8 @@
           <input class="formVariantId" name="id" type="hidden" value="{{ product_upsell.selected_or_first_available_variant.id }}">
           {%- liquid
                         assign fq_rule = product_upsell.selected_or_first_available_variant.quantity_rule
-                        assign fq_min = 1
-                        assign fq_step = 1
+                        assign fq_min = settings.wholesale_qty_min | default: 1
+                        assign fq_step = settings.wholesale_qty_step | default: 1
                         if fq_rule.min > 1
                           assign fq_min = fq_rule.min
                         endif
