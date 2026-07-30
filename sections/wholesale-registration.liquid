@@ -56,34 +56,15 @@
       Welcome to RainCaper — we're so happy you're here. To activate your wholesale account, please complete this short form. Our team will review and follow up promptly so you can begin browsing and stocking your favorite styles.
     </p>
 
-    {%- form 'create_customer', id: 'wsf-form', novalidate: 'novalidate' -%}
+    <form id="wsf-form" novalidate>
 
-      {%- if form.posted_successfully? -%}
-        <div class="wsf-msg success">
-          Thank you — your application has been received. Our team will review it and follow up within 1–2 business days. You'll receive an email with next steps once approved.
-        </div>
-      {%- endif -%}
+      <div class="wsf-msg success" id="wsf-success" style="display:none">
+        Thank you — your application has been received. Our team will review it and follow up within 1–2 business days. You'll receive an email with next steps once approved.
+      </div>
 
-      {%- if form.errors -%}
-        <div class="wsf-msg error">
-          {% for field in form.errors %}
-            <p style="margin:4px 0">
-              {%- if field == 'email' -%}
-                There was a problem with the email address: {{ form.errors.messages[field] }}. If you've applied before, please contact us at wholesale@raincaper.com.
-              {%- else -%}
-                {{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}.
-              {%- endif -%}
-            </p>
-          {% endfor %}
-        </div>
-      {%- endif -%}
-
-      {%- comment -%} === Hidden fields submitted to /account === {%- endcomment -%}
-      <input type="hidden" name="customer[tags]" value="wholesale-pending, wholesale">
-      <input type="hidden" name="customer[password]" id="wsf-password">
-      <input type="hidden" name="customer[password_confirmation]" id="wsf-password-confirm">
-      <input type="hidden" name="customer[note]" id="wsf-note">
-      <input type="hidden" name="customer[accepts_marketing]" id="wsf-accepts-marketing" value="false">
+      <div class="wsf-msg error" id="wsf-error" style="display:none">
+        <p style="margin:4px 0" id="wsf-error-text"></p>
+      </div>
 
       <!-- ============ COMPANY DETAILS ============ -->
       <div class="wsf-section">
@@ -363,7 +344,7 @@
 
       <button type="submit" class="wsf-submit" id="wsf-submit">Submit Application</button>
 
-    {%- endform -%}
+    </form>
   </div>
 </div>
 
@@ -461,28 +442,87 @@
     return lines.join('\n');
   }
 
+  var ENDPOINT = {{ section.settings.endpoint_url | default: '' | json }};
+
+  function val(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+  function collect(){
+    return {
+      email: val('wsf-email'),
+      first_name: val('wsf-first-name'),
+      last_name: val('wsf-last-name'),
+      phone: val('wsf-phone-number'),
+      phone_country: val('wsf-phone-cc'),
+      company_name: val('wsf-company'),
+      website: val('wsf-website'),
+      ship_address1: val('wsf-ship-1'),
+      ship_address2: val('wsf-ship-2'),
+      ship_city: val('wsf-ship-city'),
+      ship_state: val('wsf-ship-province'),
+      ship_zip: val('wsf-ship-zip'),
+      ship_country: val('wsf-ship-country'),
+      bill_different: document.getElementById('wsf-billing-different').checked ? '1' : '',
+      bill_address1: val('wsf-bill-1'),
+      bill_address2: val('wsf-bill-2'),
+      bill_city: val('wsf-bill-city'),
+      bill_state: val('wsf-bill-province'),
+      bill_zip: val('wsf-bill-zip'),
+      bill_country: val('wsf-bill-country'),
+      business_type: val('wsf-business-type'),
+      title: val('wsf-title'),
+      contact2_name: val('wsf-add-name'),
+      contact2_title: val('wsf-add-title'),
+      contact2_email: val('wsf-add-email'),
+      contact2_phone: (val('wsf-add-phone-cc') + ' ' + val('wsf-add-phone')).trim(),
+      social_links: val('wsf-social'),
+      tax_id: val('wsf-tax-id'),
+      reseller_cert: val('wsf-resale-cert-url'),
+      monthly_volume: val('wsf-volume'),
+      hear_about: val('wsf-source'),
+      store_description: val('wsf-about'),
+      newsletter: document.getElementById('wsf-newsletter').checked ? '1' : ''
+    };
+  }
+
+  function showError(msg){
+    document.getElementById('wsf-error-text').textContent = msg;
+    document.getElementById('wsf-error').style.display = 'block';
+    document.getElementById('wsf-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   form.addEventListener('submit', function(e){
+    e.preventDefault();
+    document.getElementById('wsf-error').style.display = 'none';
+
     if(!form.checkValidity()){
-      // Let the browser show native validation
+      form.reportValidity();
       return;
     }
-    // Generate a hidden random password
-    var pw = generatePassword();
-    document.getElementById('wsf-password').value = pw;
-    document.getElementById('wsf-password-confirm').value = pw;
 
-    // Aggregate the note
-    document.getElementById('wsf-note').value = buildNote();
+    if(!ENDPOINT){
+      showError('This form is not configured yet. Please email wholesale@raincaper.com and we will set up your account.');
+      return;
+    }
 
-    // Newsletter checkbox -> customer[accepts_marketing]
-    document.getElementById('wsf-accepts-marketing').value =
-      document.getElementById('wsf-newsletter').checked ? 'true' : 'false';
-
-    // Disable button to prevent double-submit
     var btn = document.getElementById('wsf-submit');
     btn.disabled = true;
     btn.textContent = 'Submitting…';
-    // Form submits naturally to /account
+
+    // URL-encoded body keeps this a "simple" request — no CORS preflight.
+    var body = new URLSearchParams(collect());
+
+    fetch(ENDPOINT, { method: 'POST', body: body })
+      .then(function(){
+        form.style.display = 'none';
+        var ok = document.getElementById('wsf-success');
+        ok.style.display = 'block';
+        ok.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      })
+      .catch(function(){
+        btn.disabled = false;
+        btn.textContent = 'Submit Application';
+        showError('We could not submit your application just now. Please try again, or email wholesale@raincaper.com and we will take it from there.');
+      });
   });
 })();
 </script>
@@ -495,6 +535,12 @@
       "type": "image_picker",
       "id": "logo",
       "label": "Logo (optional — defaults to shop name)"
+    },
+    {
+      "type": "text",
+      "id": "endpoint_url",
+      "label": "Application endpoint URL",
+      "info": "Google Apps Script web app /exec URL that records the application and creates the Shopify customer."
     }
   ],
   "presets": [
