@@ -508,21 +508,53 @@
     btn.disabled = true;
     btn.textContent = 'Submitting…';
 
-    // URL-encoded body keeps this a "simple" request — no CORS preflight.
-    var body = new URLSearchParams(collect());
+    // Post through a hidden iframe. Apps Script /exec redirects to
+    // script.googleusercontent.com, which fetch() cannot read cross-origin —
+    // that rejection surfaced as a failure even when the row saved fine.
+    // A form targeted at an iframe has no such restriction.
+    var data = collect();
+    var frameName = 'wsf-frame-' + Date.now();
 
-    fetch(ENDPOINT, { method: 'POST', body: body })
-      .then(function(){
-        form.style.display = 'none';
-        var ok = document.getElementById('wsf-success');
-        ok.style.display = 'block';
-        ok.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      })
-      .catch(function(){
-        btn.disabled = false;
-        btn.textContent = 'Submit Application';
-        showError('We could not submit your application just now. Please try again, or email wholesale@raincaper.com and we will take it from there.');
-      });
+    var iframe = document.createElement('iframe');
+    iframe.name = frameName;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    var poster = document.createElement('form');
+    poster.method = 'POST';
+    poster.action = ENDPOINT;
+    poster.target = frameName;
+    poster.style.display = 'none';
+
+    Object.keys(data).forEach(function(key){
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = data[key];
+      poster.appendChild(input);
+    });
+    document.body.appendChild(poster);
+
+    var settled = false;
+    var timer = setTimeout(function(){
+      if (settled) return;
+      settled = true;
+      btn.disabled = false;
+      btn.textContent = 'Submit Application';
+      showError('We could not confirm your submission. Please email wholesale@raincaper.com and we will take it from there.');
+    }, 20000);
+
+    iframe.addEventListener('load', function(){
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      form.style.display = 'none';
+      var ok = document.getElementById('wsf-success');
+      ok.style.display = 'block';
+      ok.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    poster.submit();
   });
 })();
 </script>
