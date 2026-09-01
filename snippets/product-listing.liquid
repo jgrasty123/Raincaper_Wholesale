@@ -172,6 +172,16 @@
       <span class="prod-title">{{ product.title }}</span>
     </a>
 
+    {%- liquid
+      assign card_sku = product.first_available_variant.sku
+      if card_sku == blank
+        assign card_sku = product.variants.first.sku
+      endif
+    -%}
+    {%- if card_sku != blank -%}
+      <span class="prod-sku" style="display:block; font-size:0.8em; opacity:0.7; margin:2px 0;">SKU: {{ card_sku }}</span>
+    {%- endif -%}
+
 <!-- Start of Judge.me code -->
   <div class='jdgm-widget jdgm-preview-badge'>
     {{ product.metafields.judgeme.badge }}

@@ -1,1 +1,144 @@
-{"sections":{"main":{"type":"main-product","blocks":{"product_variants":{"type":"product_variants","settings":{}},"product_quantity":{"type":"product_quantity","settings":{}},"product_buttons":{"type":"product_buttons","settings":{"show_gift_card_recipient":false,"internationl_message":"It is no longer feasible to ship our reverse-opening umbrellas internationally. We hope you select a folding travel umbrella instead!"}},"product_availability":{"type":"product_availability","disabled":true,"settings":{}},"product_description":{"type":"product_description","settings":{"show_as_accordion":true,"default_open_accordion":true}},"contact_popup":{"type":"contact_popup","settings":{}},"social_sharing":{"type":"social_sharing","settings":{"show_twitter":true,"show_facebook":true,"show_pinterest":true}}},"block_order":["product_variants","product_quantity","product_buttons","product_availability","product_description","contact_popup","social_sharing"],"custom_css":[".price,.price__regular,.product-price {font-size: 1.75rem; \/* Adjust as needed *\/ font-weight: bold;}"],"settings":{"product_form_background":"#ffffff","product_page_border":"rgba(0,0,0,0)","form_left":true,"show_tax_notice":false,"media_size":"small","thumbnail_position":"scroll_small","click_to_enlarge":true,"sticky_images":true,"enable_video_looping":true,"allow_multiple":true}},"product-content":{"type":"main-product-content","blocks":{"fb1f4d16-df0d-45b5-9465-721dc7a91c53":{"type":"product_description","settings":{"default_open_accordion":true}},"0955cf39-fd59-420a-8983-482ef3894fdd":{"type":"accordion_content","settings":{"page":"about-us","title":"Accordion title","text":"<p>Add content shared across all products or assign a metafield for unique product content<\/p>","default_open_accordion":false}},"f8c611f2-6295-4e9d-8b7b-4becd3547203":{"type":"featured_products","settings":{"title":"Featured products","featured_product_1":"","show_product_1":true,"featured_product_2":"","show_product_2":true}}},"block_order":["fb1f4d16-df0d-45b5-9465-721dc7a91c53","0955cf39-fd59-420a-8983-482ef3894fdd","f8c611f2-6295-4e9d-8b7b-4becd3547203"],"disabled":true,"settings":{"background":"#f9f9f9","allow_multiple":false}},"1740881251563c3dbf":{"type":"apps","settings":{"display_wide":false}},"product-recommendations":{"type":"product-recommendations","settings":{"product_recommendations_heading":"You may also like","per_row":5,"limit":5}},"1743624070034f6c57":{"type":"apps","settings":{"display_wide":false}}},"order":["main","product-content","1740881251563c3dbf","product-recommendations","1743624070034f6c57"]}
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "product_variants": {
+          "type": "product_variants",
+          "settings": {}
+        },
+        "product_quantity": {
+          "type": "product_quantity",
+          "settings": {}
+        },
+        "product_buttons": {
+          "type": "product_buttons",
+          "settings": {
+            "show_gift_card_recipient": false,
+            "internationl_message": "It is no longer feasible to ship our reverse-opening umbrellas internationally. We hope you select a folding travel umbrella instead!"
+          }
+        },
+        "product_availability": {
+          "type": "product_availability",
+          "disabled": true,
+          "settings": {}
+        },
+        "product_description": {
+          "type": "product_description",
+          "settings": {
+            "show_as_accordion": true,
+            "default_open_accordion": true
+          }
+        },
+        "contact_popup": {
+          "type": "contact_popup",
+          "settings": {}
+        },
+        "social_sharing": {
+          "type": "social_sharing",
+          "settings": {
+            "show_twitter": true,
+            "show_facebook": true,
+            "show_pinterest": true
+          }
+        },
+        "product_sku": {
+          "type": "product_sku",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "product_variants",
+        "product_sku",
+        "product_quantity",
+        "product_buttons",
+        "product_availability",
+        "product_description",
+        "contact_popup",
+        "social_sharing"
+      ],
+      "custom_css": [
+        ".price,.price__regular,.product-price {font-size: 1.75rem; /* Adjust as needed */ font-weight: bold;}"
+      ],
+      "settings": {
+        "product_form_background": "#ffffff",
+        "product_page_border": "rgba(0,0,0,0)",
+        "form_left": true,
+        "show_tax_notice": false,
+        "media_size": "small",
+        "thumbnail_position": "scroll_small",
+        "click_to_enlarge": true,
+        "sticky_images": true,
+        "enable_video_looping": true,
+        "allow_multiple": true
+      }
+    },
+    "product-content": {
+      "type": "main-product-content",
+      "blocks": {
+        "fb1f4d16-df0d-45b5-9465-721dc7a91c53": {
+          "type": "product_description",
+          "settings": {
+            "default_open_accordion": true
+          }
+        },
+        "0955cf39-fd59-420a-8983-482ef3894fdd": {
+          "type": "accordion_content",
+          "settings": {
+            "page": "about-us",
+            "title": "Accordion title",
+            "text": "<p>Add content shared across all products or assign a metafield for unique product content</p>",
+            "default_open_accordion": false
+          }
+        },
+        "f8c611f2-6295-4e9d-8b7b-4becd3547203": {
+          "type": "featured_products",
+          "settings": {
+            "title": "Featured products",
+            "featured_product_1": "",
+            "show_product_1": true,
+            "featured_product_2": "",
+            "show_product_2": true
+          }
+        }
+      },
+      "block_order": [
+        "fb1f4d16-df0d-45b5-9465-721dc7a91c53",
+        "0955cf39-fd59-420a-8983-482ef3894fdd",
+        "f8c611f2-6295-4e9d-8b7b-4becd3547203"
+      ],
+      "disabled": true,
+      "settings": {
+        "background": "#f9f9f9",
+        "allow_multiple": false
+      }
+    },
+    "1740881251563c3dbf": {
+      "type": "apps",
+      "settings": {
+        "display_wide": false
+      }
+    },
+    "product-recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "product_recommendations_heading": "You may also like",
+        "per_row": 5,
+        "limit": 5
+      }
+    },
+    "1743624070034f6c57": {
+      "type": "apps",
+      "settings": {
+        "display_wide": false
+      }
+    }
+  },
+  "order": [
+    "main",
+    "product-content",
+    "1740881251563c3dbf",
+    "product-recommendations",
+    "1743624070034f6c57"
+  ]
+}
