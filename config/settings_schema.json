@@ -12,7 +12,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Display-level minimums shown on product pages, quick view and collection cards. Set both to 1 to disable. Note: hard enforcement at checkout requires a validation app (e.g. Checkout Blocks)."
+        "content": "Fallback minimums for buyers with no B2B quantity rules. Leave both at 1 so each product's real B2B catalog quantity rule drives what's shown. Raise only to apply a blanket minimum to every product."
       },
       {
         "type": "range",
@@ -21,7 +21,7 @@
         "min": 1,
         "max": 24,
         "step": 1,
-        "default": 3
+        "default": 1
       },
       {
         "type": "range",
@@ -30,7 +30,7 @@
         "min": 1,
         "max": 24,
         "step": 1,
-        "default": 3
+        "default": 1
       }
     ]
   },
