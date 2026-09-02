@@ -196,17 +196,27 @@
   {%- liquid
     assign card_rule = product.first_available_variant.quantity_rule
     assign card_min = settings.wholesale_qty_min | default: 1
+    assign card_step = settings.wholesale_qty_step | default: 1
     if product.metafields.custom.moq_min.value != blank
       assign card_min = product.metafields.custom.moq_min.value
+    endif
+    if product.metafields.custom.moq_increment.value != blank
+      assign card_step = product.metafields.custom.moq_increment.value
     endif
     if card_rule.min > 1
       assign card_min = card_rule.min
     endif
+    if card_rule.increment > 1
+      assign card_step = card_rule.increment
+    endif
   -%}
   <!-- Quantity honors B2B catalog minimums; defaults to 1 outside a B2B catalog -->
   <input type="hidden" name="quantity" value="{{ card_min }}" />
-  {%- if card_min > 1 -%}
-    <p class="quantity-rule-note" style="font-size: 0.85em; margin: 4px 0 0; opacity: 0.75;">Minimum {{ card_min }} per order</p>
+  {%- if card_min > 1 or card_step > 1 -%}
+    <p class="quantity-rule-note" style="font-size: 0.85em; margin: 4px 0 0; opacity: 0.75;">
+      {%- if card_min > 1 -%}Min {{ card_min }}{%- endif -%}
+      {%- if card_step > 1 %}{% if card_min > 1 %} &middot; {% endif %}units of {{ card_step }}{%- endif -%}
+    </p>
   {%- endif -%}
 
   <!-- Success/Error messages (already present) -->
