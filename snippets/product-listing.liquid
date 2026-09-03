@@ -236,32 +236,7 @@
   </div>
 
   <!-- Visible Add to Cart button -->
-  {%- liquid
-    if product.template_suffix == 'pre-order'
-      assign call_to_action = 'products.product.pre_order' | t
-      assign is_preorder = 'data-preorder'
-    else
-      assign call_to_action = 'products.product.add_to_cart' | t
-      assign is_preorder = ''
-    endif
-    unless current_variant.available
-      assign call_to_action = 'products.product.sold_out' | t
-      assign is_preorder = ''
-    endunless
-
-    assign product_form_id = 'product-form-' | append: section.id
-
-  -%}
- <button 
-    type="submit"
-    name="button"
-    class="add AddtoCart js-ajax-submit {% if settings.show_payment_button and product.selling_plan_groups.size == 0 %} secondary-button{% endif %}" 
-    {{ is_preorder }}
-    {% unless current_variant.available %}disabled{% endunless %}
-  >
-    {{ call_to_action }}
-  </button>
-  {% comment %} {% if product.available %}
+  {% if product.available %}
     <button
       type="submit"
       class="add js-ajax-submit add-to-cart-button"
@@ -281,7 +256,7 @@
     >
       {{ 'products.product.sold_out' | t }}
     </button>
-  {% endif %} {% endcomment %}
+  {% endif %}
 {% endform %}
 
 
