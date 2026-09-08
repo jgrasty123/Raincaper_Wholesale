@@ -12,28 +12,6 @@
     "1625671734793532ca": {
       "type": "slideshow",
       "blocks": {
-        "image_3BaP3g": {
-          "type": "image",
-          "settings": {
-            "overlay": false,
-            "text_align": "left",
-            "caption_horizontal": 50,
-            "caption_vertical": 50,
-            "hide_caption_background": false,
-            "caption_below": false,
-            "heading": "Slide image title",
-            "subheading": "<p>Slide image subheading</p>",
-            "link": "",
-            "button_text": "Button",
-            "second_link": "",
-            "second_button_text": "Button 2",
-            "slide_text_color": "#000000",
-            "cta_color": "#ffffff",
-            "cta_background": "#000000",
-            "caption_background": "rgba(0,0,0,0)",
-            "caption_background_opacity": 20
-          }
-        },
         "image_KrfraJ": {
           "type": "image",
           "settings": {
@@ -106,7 +84,6 @@
         }
       },
       "block_order": [
-        "image_3BaP3g",
         "image_KrfraJ",
         "1625671734793532ca-1",
         "image_UnUtCN"
