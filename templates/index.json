@@ -14,9 +14,8 @@
       "blocks": {
         "image_KrfraJ": {
           "type": "image",
-          "disabled": true,
           "settings": {
-            "image": "shopify://shop_images/Shopify-M67-Banner_TEXT.jpg",
+            "image": "shopify://shop_images/Shopify_Banner_M67_v4.jpg",
             "overlay": false,
             "text_align": "left",
             "caption_horizontal": 50,
@@ -38,6 +37,7 @@
         },
         "1625671734793532ca-1": {
           "type": "image",
+          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/Shopify_Banner_-_Wholesale.jpg",
             "overlay": false,
